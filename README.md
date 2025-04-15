@@ -6,8 +6,8 @@ npx create-react-app caro-game && cd caro-game
 ```
 npm start
 ```
-
-Now stop to edit game!
+### Now press `Ctrl + C` to stop
+### You can ask ChatGPT to edit files `App.js` & `App.css` to become a new game!
 ```
 nano src/App.js
 ```
