@@ -208,7 +208,9 @@ git push -u origin main
 ```
 #### Enter User name & PAT token for pass
 
-## Install Fleek CLI
+## Creat a fleek account
+### Singup with your Email ✅
+### Install Fleek CLI
 ```
 npm install -g @fleek-platform/cli
 ```
