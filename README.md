@@ -1,16 +1,21 @@
 # How to deploy app with Fleek
-## Creat a Simple Caro Game
+## Step 1: Creat a Simple Caro Game
+### If you don't want to creat a new, you can start at Step 3!
+
 ```
-npx create-react-app caro-game && cd caro-game
+npx create-react-app caro-on-fleek && cd caro-on-fleek
 ```
 ```
 npm start
 ```
 ### Now press `Ctrl + C` to stop
 ### You can ask ChatGPT to edit files `App.js` & `App.css` to become a new game!
+### Edit `App.js` file:
 ```
-nano src/App.js
+rm src/App.js && nano src/App.js
 ```
+#### Paste code below to `App.js`
+
 ```
 import React, { useState, useEffect } from 'react';
 import './App.css';
@@ -124,9 +129,13 @@ function calculateWinner(squares) {
 
 export default App;
 ```
+
+### Edit `App.css` file:
 ```
-nano src/App.css
+rm src/App.css && nano src/App.css
 ```
+#### Paste code below to `App.css`
+
 ```
 .game {
   display: flex;
@@ -175,11 +184,11 @@ nano src/App.css
   font-size: 16px;
 }
 ```
-## Push your app to Github
-### 1. Create a New Repository on GitHub
-Creat with name `caro-name`
+## Step 2: Push your app to Github
+### Create a New Repository on GitHub
+Creat with name `caro-on-fleek`
 
-### 2. Initialize Git in Your Project (On your VPS)
+### Initialize Git in Your Project (On your VPS)
 ```
 git init
 ```
@@ -189,11 +198,11 @@ git add .
 ```
 git commit -m "Initial commit"
 ```
-### 3. Connect Your GitHub Repository to Your Local Project
+### Connect Your GitHub Repository to Your Local Project
 ```
-git remote add origin https://github.com/USERNAME/caro-game.git
+git remote add origin https://github.com/USERNAME/caro-on-fleek.git
 ```
-### 4. Push Your Code to GitHub
+### Push Your Code to GitHub
 #### Check branch
 ```
 git branch
@@ -207,8 +216,16 @@ git branch -m master main
 git push -u origin main
 ```
 #### Enter User name & PAT token for pass
+### If you use codespace run
+```
+git remote set-url origin https://GITHUB_USERNAME:YOUR_TOKEN@github.com/GITHUB_USERNAME/caro-on-fleek.git
+```
+#### Then run
+```
+git push -u origin main
+```
 
-## Creat a fleek account
+## Step 3: Creat a fleek account
 ### Singup with your Email ✅
 ### Install Fleek CLI
 ```
@@ -224,17 +241,19 @@ fleek login
 Confirm on your Fleek account !
 `✅ Success! You are now logged in to the Fleek Platform.`
 
+### Fork my repository
+My app: https://github.com/ToanBm/caro-on-fleek
 ### Clone the repository
 ```
-git clone https://github.com/your-git-user/caro-game.git
+git clone https://github.com/YOUR-GITHUB-USER/caro-on-fleek.git
 ```
 ```
-cd caro-game
+cd caro-on-fleek
 npm i
 npm run build
 ```
 
-## Deploy app on Fleek
+## Step 4: Deploy app on Fleek
 ### Visit Fleek dashboard > Add new > Deploy my site
 ### Connect github > choose repo > deploy
 
