@@ -10,6 +10,7 @@ const WINNING_COMBINATIONS = [
 const App = () => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const winner = calculateWinner(board);
 
   useEffect(() => {
@@ -49,8 +50,10 @@ const App = () => {
     setIsXNext(true);
   };
 
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+
   return (
-    <div className="game-container">
+    <div className={`game-container ${darkMode ? 'dark' : ''}`}>
       <h1>Tic-Tac-Toe</h1>
       <div className="status">
         {winner
@@ -71,6 +74,9 @@ const App = () => {
         ))}
       </div>
       <button className="reset-btn" onClick={resetGame}>Start New Game</button>
+      <button className="dark-mode-btn" onClick={toggleDarkMode}>
+        {darkMode ? 'Light Mode' : 'Dark Mode'}
+      </button>
     </div>
   );
 };
