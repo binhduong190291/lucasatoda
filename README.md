@@ -1,89 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-const App = () => {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [isXNext, setIsXNext] = useState(true);
-  const [winner, setWinner] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-  useEffect(() => {
-    if (!isXNext && !gameOver) {
-      const timeoutId = setTimeout(() => {
-        botMove();
-      }, 800);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isXNext, board, gameOver]);
+.game-container {
+  text-align: center;
+  width: 90vw;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
 
-  const handleClick = (index) => {
-    if (board[index] || gameOver) return;
+h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
 
-    const newBoard = [...board];
-    newBoard[index] = isXNext ? 'X' : 'O';
-    setBoard(newBoard);
-    setIsXNext(!isXNext);
+.status {
+  font-size: 18px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
 
-    const winner = calculateWinner(newBoard);
-    if (winner) {
-      setWinner(winner);
-      setGameOver(true);
-    } else if (newBoard.every(cell => cell !== null)) {
-      setGameOver(true);
-    }
-  };
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
 
-  const botMove = () => {
-    const emptyCells = board.map((val, idx) => val === null ? idx : null).filter(idx => idx !== null);
-    const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    handleClick(randomMove);
-  };
+.square {
+  width: 100%;
+  height: 100px;
+  background-color: #fff;
+  border: 2px solid #ddd;
+  font-size: 50px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
 
-  const calculateWinner = (board) => {
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-      [0, 4, 8], [2, 4, 6]             // Diagonals
-    ];
-    for (let [a, b, c] of lines) {
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
-      }
-    }
-    return null;
-  };
+.square:hover {
+  transform: scale(1.1);
+}
 
-  const resetGame = () => {
-    setBoard(Array(9).fill(null));
-    setIsXNext(true);
-    setWinner(null);
-    setGameOver(false);
-  };
+.square.X {
+  color: #f56a79;
+}
 
-  return (
-    <div className="game-container">
-      <h1>Tic-Tac-Toe</h1>
-      <div className="status">
-        {winner
-          ? `🎉 ${winner} wins!`
-          : gameOver
-          ? 'It\'s a draw!'
-          : `Next: ${isXNext ? 'Player (X)' : 'Bot (O)'}`}
-      </div>
-      <div className="board">
-        {board.map((cell, index) => (
-          <div
-            key={index}
-            className={`square ${cell}`}
-            onClick={() => handleClick(index)}
-          >
-            {cell}
-          </div>
-        ))}
-      </div>
-      <button className="reset-btn" onClick={resetGame}>Start New Game</button>
-    </div>
-  );
-};
+.square.O {
+  color: #4da8da;
+}
 
-export default App;
+.reset-btn {
+  padding: 10px 20px;
+  background-color: #4da8da;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+.reset-btn:hover {
+  background-color: #4a90e2;
+}
