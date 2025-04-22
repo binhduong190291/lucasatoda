@@ -1,79 +1,87 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const WINNING_COMBINATIONS = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+  [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+  [0, 4, 8], [2, 4, 6] // diagonals
+];
+
 const App = () => {
-  const [grid, setGrid] = useState(Array(9).fill(null));
-  const [isXTurn, setIsXTurn] = useState(true);
-  const winner = getWinner(grid);
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+  const winner = calculateWinner(board);
 
   useEffect(() => {
-    if (!isXTurn && !winner) {
-      const delay = setTimeout(() => {
-        makeBotMove();
-      }, 300);
-      return () => clearTimeout(delay);
+    if (!isXNext && !winner) {
+      const timeout = setTimeout(() => {
+        botMove();
+      }, 500);
+      return () => clearTimeout(timeout);
     }
-  }, [isXTurn, grid, winner]);
+  }, [isXNext, board, winner]);
 
-  const handleClick = (idx) => {
-    if (grid[idx] || winner || !isXTurn) return;
-    const updated = [...grid];
-    updated[idx] = 'X';
-    setGrid(updated);
-    setIsXTurn(false);
+  const handleClick = (index) => {
+    if (board[index] || winner || !isXNext) return;
+
+    const newBoard = [...board];
+    newBoard[index] = 'X';
+    setBoard(newBoard);
+    setIsXNext(false);
   };
 
-  const makeBotMove = () => {
-    const available = grid
-      .map((val, i) => (val === null ? i : null))
-      .filter((i) => i !== null);
-    if (available.length === 0) return;
-    const randomIdx = available[Math.floor(Math.random() * available.length)];
-    const updated = [...grid];
-    updated[randomIdx] = 'O';
-    setGrid(updated);
-    setIsXTurn(true);
+  const botMove = () => {
+    const availableSpaces = board
+      .map((val, idx) => (val === null ? idx : null))
+      .filter((idx) => idx !== null);
+
+    if (availableSpaces.length === 0) return;
+
+    const move = availableSpaces[Math.floor(Math.random() * availableSpaces.length)];
+    const newBoard = [...board];
+    newBoard[move] = 'O';
+    setBoard(newBoard);
+    setIsXNext(true);
   };
 
-  const restart = () => {
-    setGrid(Array(9).fill(null));
-    setIsXTurn(true);
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setIsXNext(true);
   };
 
   return (
-    <div className="wrapper">
-      <h1>🎮 Retro Caro</h1>
-      <p className="info">
+    <div className="game-container">
+      <h1>Tic-Tac-Toe</h1>
+      <div className="status">
         {winner
           ? `🏆 Winner: ${winner}`
-          : grid.every((x) => x !== null)
+          : board.every((cell) => cell !== null)
           ? '🤝 It\'s a draw!'
-          : `⏳ Turn: ${isXTurn ? 'You (X)' : 'Bot (O)'}`}
-      </p>
-      <div className="grid">
-        {grid.map((cell, idx) => (
-          <div key={idx} className="cell" onClick={() => handleClick(idx)}>
+          : `Next: ${isXNext ? 'You (X)' : 'Bot (O)'}`}
+      </div>
+      <div className="board">
+        {board.map((cell, index) => (
+          <div
+            key={index}
+            className={`square ${cell}`}
+            onClick={() => handleClick(index)}
+          >
             {cell}
           </div>
         ))}
       </div>
-      <button className="restart" onClick={restart}>🔄 New Game</button>
+      <button className="reset-btn" onClick={resetGame}>Start New Game</button>
     </div>
   );
 };
 
-const getWinner = (grid) => {
-  const wins = [
-    [0,1,2],[3,4,5],[6,7,8], // Rows
-    [0,3,6],[1,4,7],[2,5,8], // Columns
-    [0,4,8],[2,4,6]          // Diagonals
-  ];
-  for (const [a, b, c] of wins) {
-    if (grid[a] && grid[a] === grid[b] && grid[a] === grid[c]) {
-      return grid[a];
+function calculateWinner(board) {
+  for (let [a, b, c] of WINNING_COMBINATIONS) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
     }
   }
   return null;
-};
+}
 
 export default App;
