@@ -12,27 +12,21 @@ const App = () => {
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [gameOver, setGameOver] = useState(false);
-  const [moveHistory, setMoveHistory] = useState([]);
-  const [botThinking, setBotThinking] = useState(false);
+  const [isMultiplayer, setIsMultiplayer] = useState(false);
 
   useEffect(() => {
-    if (!isXNext && !gameOver) {
-      setBotThinking(true);
-      setTimeout(() => {
-        botMove();
-        setBotThinking(false);
-      }, 1000);
+    if (!isXNext && !gameOver && !isMultiplayer) {
+      setTimeout(() => botMove(), 1000);
     }
-  }, [isXNext, board, gameOver]);
+  }, [isXNext, board, gameOver, isMultiplayer]);
 
   const handleClick = (index) => {
     if (board[index] || gameOver) return;
 
     const newBoard = [...board];
-    newBoard[index] = 'X';
+    newBoard[index] = isXNext ? 'X' : 'O';
     setBoard(newBoard);
-    setMoveHistory([...moveHistory, index]);
-    setIsXNext(false);
+    setIsXNext(!isXNext);
 
     const winner = calculateWinner(newBoard);
     if (winner) {
@@ -46,7 +40,6 @@ const App = () => {
     const newBoard = [...board];
     newBoard[bestMove] = 'O';
     setBoard(newBoard);
-    setMoveHistory([...moveHistory, bestMove]);
     setIsXNext(true);
 
     const winner = calculateWinner(newBoard);
@@ -57,11 +50,21 @@ const App = () => {
   };
 
   const getBestMove = (board) => {
-    const availableSpaces = board
-      .map((val, idx) => (val === null ? idx : null))
-      .filter((idx) => idx !== null);
+    // Check for winning or blocking moves
+    const availableMoves = board.map((val, index) => (val === null ? index : null)).filter((index) => index !== null);
+    
+    // Block player's winning move
+    for (let i = 0; i < availableMoves.length; i++) {
+      const move = availableMoves[i];
+      const testBoard = [...board];
+      testBoard[move] = 'O';
+      if (calculateWinner(testBoard) === 'O') {
+        return move;
+      }
+    }
 
-    return availableSpaces[Math.floor(Math.random() * availableSpaces.length)];
+    // Make a random move if no winning or blocking move found
+    return availableMoves[Math.floor(Math.random() * availableMoves.length)];
   };
 
   const calculateWinner = (board) => {
@@ -78,7 +81,11 @@ const App = () => {
     setIsXNext(true);
     setWinner(null);
     setGameOver(false);
-    setMoveHistory([]);
+  };
+
+  const toggleMultiplayer = () => {
+    setIsMultiplayer(!isMultiplayer);
+    resetGame();
   };
 
   return (
@@ -88,14 +95,14 @@ const App = () => {
         {winner
           ? `🎉 ${winner} wins!`
           : gameOver
-          ? '😞 It\'s a draw!'
-          : `Next: ${isXNext ? 'You (X)' : 'Bot (O)'}`}
+          ? "It's a draw!"
+          : `Next: ${isXNext ? 'Player 1 (X)' : isMultiplayer ? 'Player 2 (O)' : 'Bot (O)'}`}
       </div>
       <div className="board">
         {board.map((cell, index) => (
           <div
             key={index}
-            className={`square ${cell} ${gameOver && winner === cell ? 'winner' : ''}`}
+            className={`square ${cell}`}
             onClick={() => handleClick(index)}
           >
             {cell}
@@ -103,7 +110,9 @@ const App = () => {
         ))}
       </div>
       <button className="reset-btn" onClick={resetGame}>Start New Game</button>
-      {botThinking && <div className="bot-thinking">Bot is thinking...</div>}
+      <button className="multiplayer-btn" onClick={toggleMultiplayer}>
+        {isMultiplayer ? 'Switch to Single Player' : 'Switch to Multiplayer'}
+      </button>
     </div>
   );
 };
