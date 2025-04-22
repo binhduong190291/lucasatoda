@@ -13,6 +13,9 @@ const App = () => {
   const [winner, setWinner] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const [isMultiplayer, setIsMultiplayer] = useState(false);
+  const [playerXWins, setPlayerXWins] = useState(0);
+  const [playerOWins, setPlayerOWins] = useState(0);
+  const [draws, setDraws] = useState(0);
 
   useEffect(() => {
     if (!isXNext && !gameOver && !isMultiplayer) {
@@ -32,6 +35,11 @@ const App = () => {
     if (winner) {
       setWinner(winner);
       setGameOver(true);
+      if (winner === 'X') setPlayerXWins(playerXWins + 1);
+      if (winner === 'O') setPlayerOWins(playerOWins + 1);
+    } else if (newBoard.every(cell => cell !== null)) {
+      setGameOver(true);
+      setDraws(draws + 1);
     }
   };
 
@@ -46,24 +54,20 @@ const App = () => {
     if (winner) {
       setWinner(winner);
       setGameOver(true);
+      if (winner === 'X') setPlayerXWins(playerXWins + 1);
+      if (winner === 'O') setPlayerOWins(playerOWins + 1);
     }
   };
 
   const getBestMove = (board) => {
-    // Check for winning or blocking moves
     const availableMoves = board.map((val, index) => (val === null ? index : null)).filter((index) => index !== null);
     
-    // Block player's winning move
     for (let i = 0; i < availableMoves.length; i++) {
       const move = availableMoves[i];
       const testBoard = [...board];
       testBoard[move] = 'O';
-      if (calculateWinner(testBoard) === 'O') {
-        return move;
-      }
+      if (calculateWinner(testBoard) === 'O') return move;
     }
-
-    // Make a random move if no winning or blocking move found
     return availableMoves[Math.floor(Math.random() * availableMoves.length)];
   };
 
@@ -91,6 +95,17 @@ const App = () => {
   return (
     <div className="game-container">
       <h1>Tic-Tac-Toe</h1>
+      <div className="scoreboard">
+        <div className="score">
+          <span>Player X: {playerXWins}</span>
+        </div>
+        <div className="score">
+          <span>Bot O: {playerOWins}</span>
+        </div>
+        <div className="score">
+          <span>Draws: {draws}</span>
+        </div>
+      </div>
       <div className="status">
         {winner
           ? `🎉 ${winner} wins!`
