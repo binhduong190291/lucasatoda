@@ -1,81 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const App = () => {
-  const [cells, setCells] = useState(Array(9).fill(null));
-  const [isXTurn, setIsXTurn] = useState(true);
-  const winner = getWinner(cells);
+function App() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [xTurn, setXTurn] = useState(true);
+  const winner = checkWinner(board);
 
   useEffect(() => {
-    if (!isXTurn && !winner) {
-      const botDelay = setTimeout(() => {
-        botPlay();
-      }, 500);
-      return () => clearTimeout(botDelay);
+    if (!xTurn && !winner) {
+      const delay = setTimeout(() => botMove(), 400);
+      return () => clearTimeout(delay);
     }
-  }, [isXTurn, cells, winner]);
+  }, [xTurn, board, winner]);
 
   const handleClick = (i) => {
-    if (cells[i] || winner || !isXTurn) return;
-    const next = [...cells];
+    if (board[i] || !xTurn || winner) return;
+    const next = [...board];
     next[i] = 'X';
-    setCells(next);
-    setIsXTurn(false);
+    setBoard(next);
+    setXTurn(false);
   };
 
-  const botPlay = () => {
-    const emptyIndices = cells
-      .map((val, idx) => (val === null ? idx : null))
-      .filter((v) => v !== null);
+  const botMove = () => {
+    let move = chooseSmartMove(board);
+    if (move !== null) {
+      const next = [...board];
+      next[move] = 'O';
+      setBoard(next);
+      setXTurn(true);
+    }
+  };
 
-    if (emptyIndices.length === 0) return;
-    const choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-
-    const newBoard = [...cells];
-    newBoard[choice] = 'O';
-    setCells(newBoard);
-    setIsXTurn(true);
+  const chooseSmartMove = (b) => {
+    // Priority: center > corners > random
+    if (!b[4]) return 4;
+    const corners = [0, 2, 6, 8].filter(i => !b[i]);
+    if (corners.length > 0) return corners[Math.floor(Math.random() * corners.length)];
+    const empty = b.map((val, i) => val === null ? i : null).filter(i => i !== null);
+    return empty.length > 0 ? empty[Math.floor(Math.random() * empty.length)] : null;
   };
 
   const reset = () => {
-    setCells(Array(9).fill(null));
-    setIsXTurn(true);
+    setBoard(Array(9).fill(null));
+    setXTurn(true);
   };
 
   return (
-    <div className="main">
-      <h2>Tic Tac Toe</h2>
-      <p className="status">
+    <div className="wrapper">
+      <h1>Caro Game: X vs Bot</h1>
+      <div className="info">
         {winner
           ? `🏆 Winner: ${winner}`
-          : cells.every((c) => c !== null)
-          ? '🤝 Draw!'
-          : `👉 ${isXTurn ? 'Your turn (X)' : 'Bot thinking...'}`}
-      </p>
+          : board.every(c => c) ? '🤝 It’s a draw!' : `👉 ${xTurn ? 'Your Turn (X)' : 'Bot is thinking...'}`}
+      </div>
       <div className="board">
-        {cells.map((val, i) => (
+        {board.map((val, i) => (
           <div key={i} className="cell" onClick={() => handleClick(i)}>
             {val}
           </div>
         ))}
       </div>
-      <button onClick={reset} className="reset-btn">Restart</button>
+      <button className="restart" onClick={reset}>Play Again</button>
     </div>
   );
-};
+}
 
-const getWinner = (cells) => {
-  const winLines = [
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
+function checkWinner(b) {
+  const lines = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
   ];
-  for (let [a,b,c] of winLines) {
-    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-      return cells[a];
-    }
+  for (let [a,b2,c] of lines) {
+    if (b[a] && b[a] === b[b2] && b[a] === b[c]) return b[a];
   }
   return null;
-};
+}
 
 export default App;
